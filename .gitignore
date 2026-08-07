@@ -1,0 +1,3 @@
+/target
+*.deb
+deb_package/usr/bin/wifi-hotspot

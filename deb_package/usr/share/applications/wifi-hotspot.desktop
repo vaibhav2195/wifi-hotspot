@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Wi-Fi Hotspot
+Comment=Concurrent Wi-Fi & Hotspot Manager
+Exec=/usr/bin/wifi-hotspot-launcher
+Icon=network-wireless-hotspot
+Terminal=false
+Type=Application
+Categories=Network;Settings;
