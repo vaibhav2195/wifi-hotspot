@@ -1,13 +1,53 @@
-# Concurrent Linux Wi-Fi Hotspot (Rust + egui)
+# 🚀 Concurrent Linux Wi-Fi Hotspot (Rust + egui)
 
-![Rust](https://img.shields.io/badge/Language-Rust-orange.svg)
-![Platform](https://img.shields.io/badge/Platform-Linux-blue.svg)
-![Distros](https://img.shields.io/badge/Distros-Arch%20%7C%20Ubuntu%20%7C%20Fedora%20%7C%20Debian-brightgreen.svg)
-![License](https://img.shields.io/badge/License-MIT-green.svg)
+<p align="center">
+  <a href="https://github.com/vaibhav2195/wifi-hotspot/releases/latest">
+    <img src="https://img.shields.io/github/v/release/vaibhav2195/wifi-hotspot?color=brightgreen&label=Latest%20Release" alt="Latest Release" />
+  </a>
+  <a href="https://github.com/vaibhav2195/wifi-hotspot/stargazers">
+    <img src="https://img.shields.io/github/stars/vaibhav2195/wifi-hotspot?style=social" alt="GitHub Stars" />
+  </a>
+  <img src="https://img.shields.io/badge/Platform-Linux-blue.svg" alt="Platform Linux" />
+  <img src="https://img.shields.io/badge/Distros-Arch%20%7C%20Ubuntu%20%7C%20Fedora%20%7C%20Debian-purple.svg" alt="Supported Distros" />
+  <img src="https://img.shields.io/badge/Rust-2024%20Edition-orange.svg" alt="Rust 2024" />
+  <a href="LICENSE">
+    <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="MIT License" />
+  </a>
+</p>
 
-A lightweight, native Linux desktop GUI application built in Rust to create and manage a **Wi-Fi Access Point (Hotspot) while remaining connected to an existing Wi-Fi network (AP/STA Concurrent Mode)**.
+<p align="center">
+  <strong>A lightweight, blazing-fast native Linux desktop GUI application built in Rust to create and manage a Wi-Fi Access Point (Hotspot) while remaining connected to an existing Wi-Fi network (AP/STA Concurrent Mode).</strong>
+</p>
 
-Unlike default NetworkManager tools which disconnect your existing Wi-Fi when activating a hotspot, this application leverages `iw`, `hostapd`, `dnsmasq`, and `iptables` to create an isolated virtual AP interface (`ap0`) alongside your physical station interface.
+---
+
+## 📖 About The Project
+
+On Linux, default desktop tools (like GNOME Settings and basic NetworkManager profiles) **disconnect your laptop from Wi-Fi** as soon as you turn on a mobile hotspot. 
+
+**Concurrent Linux Wi-Fi Hotspot** solves this problem. It leverages Linux kernel wireless virtualization (`nl80211`), `hostapd`, `dnsmasq`, and `iptables` to create an isolated virtual AP interface (`ap0`) alongside your active station interface. You can now **share your Wi-Fi internet connection (e.g. hotel, hostel, university, campus, or office Wi-Fi) with your phone, tablet, and other devices seamlessly**.
+
+### 🌟 Key Highlights
+- 🎯 **True AP/STA Concurrency**: Share Wi-Fi without losing your connection.
+- 📱 **Real-Time Connected Devices**: See hostnames, IPs, MAC addresses, live signal strengths (📶 dBm), and upload/download transfer rates.
+- 🚫 **Multi-Layer Device Blocking**: Instantly kick and ban unwanted devices with 1-click Layer-2 deauthentication (`hostapd_cli`), MAC blacklist (`hostapd.deny`), and Layer-3 firewall packet filtering (`iptables DROP`).
+- 🛡️ **Fail-Safe Channel Roaming**: Background watchdog auto-synchronizes the hotspot if you roam across access points or switch to a different Wi-Fi network on another channel.
+- ⚡ **Zero DNS Port 53 Conflicts**: Engineered for Arch Linux, Ubuntu, and Fedora without conflicting with `systemd-resolved`.
+- 🎛️ **Modern, Simple Interface**: Minimalist primary view with one-click start/stop, plus a collapsible advanced drawer for power users.
+
+---
+
+## 📑 Table of Contents
+- [✨ Features](#-features)
+- [🛠 System Prerequisites](#-system-prerequisites)
+- [🚀 Installation Options](#-installation-options)
+  - [Arch Linux (`makepkg`)](#option-a-arch-linux-makepkg)
+  - [Debian / Ubuntu (`.deb` Package)](#option-b-debian--ubuntu-deb-package)
+  - [Universal Installation (Any Distro)](#option-c-universal-installation-any-linux-distro)
+  - [Run from Source](#option-d-run-directly-from-source)
+- [📡 Wi-Fi Hardware & Driver Compatibility](#-wi-fi-hardware--driver-compatibility)
+- [⚡ How It Works Under the Hood](#-how-it-works-under-the-hood)
+- [📜 License](#-license)
 
 ---
 
@@ -29,7 +69,7 @@ Unlike default NetworkManager tools which disconnect your existing Wi-Fi when ac
 
 ## 🛠 System Prerequisites
 
-Install the required networking daemons and utilities for your distribution:
+Install the standard networking daemons and utilities for your distribution:
 
 ### Arch Linux / Manjaro / EndeavourOS
 ```bash
@@ -59,6 +99,7 @@ makepkg -si
 ```
 
 ### Option B: Debian / Ubuntu (`.deb` Package)
+Download the latest `.deb` release from [GitHub Releases](https://github.com/vaibhav2195/wifi-hotspot/releases/latest) or build locally:
 ```bash
 ./build_deb.sh
 sudo dpkg -i wifi-hotspot_2.0.0_amd64.deb
@@ -99,9 +140,9 @@ Linux AP/STA concurrency requires wireless drivers that implement `nl80211` virt
 | **Broadcom** (BCM43xx) | `brcmfmac` | **Basic Support** | Chipset dependent | Restricted |
 | **Broadcom Proprietary** | `wl` | **Not Supported** | Proprietary driver lacks `nl80211` virtual interface support | Not Supported |
 
-> [!NOTE]
-> **Checking Concurrency On Your Machine:**
-> Run `iw list` in your terminal and look for `valid interface combinations`. Look for a rule allowing both `managed` and `AP` simultaneously, for example:
+> [!TIP]
+> **Check Concurrency On Your System:**
+> Run `iw list` in your terminal and look for `valid interface combinations`. Look for a rule allowing both `managed` and `AP` simultaneously:
 > `#{ managed } <= 1, #{ AP } <= 1, total <= 2, #channels <= 1`
 
 ---
@@ -113,6 +154,11 @@ Linux AP/STA concurrency requires wireless drivers that implement `nl80211` virt
 3. **Dedicated Subnet & Conflict-Free DNS**: Configures `ap0` on `192.168.50.1/24`. `dnsmasq` binds specifically to `192.168.50.1:53` with `except-interface=lo`, preventing any port 53 collision with `systemd-resolved`.
 4. **Hostapd Authentication**: Generates dynamic configuration files in `/tmp` matching the physical radio's active frequency channel and launches `hostapd` for WPA2-PSK security.
 5. **IP Forwarding & NAT**: Enables Linux kernel packet forwarding (`sysctl net.ipv4.ip_forward=1`) and provisions `iptables` MASQUERADE rules so connected clients route internet through the upstream interface.
+
+---
+
+## 🤝 Contributing
+Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/vaibhav2195/wifi-hotspot/issues).
 
 ---
 
