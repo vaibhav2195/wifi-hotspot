@@ -1,10 +1,10 @@
 Package: wifi-hotspot
-Version: 0.1.0
+Version: 2.0.0
 Section: net
 Priority: optional
 Architecture: amd64
 Depends: hostapd, dnsmasq, iw, iproute2, iptables, pkexec
-Maintainer: Antigravity <support@example.com>
+Maintainer: Vaibhav Sharma <vaibhav.sharma.2195@gmail.com>
 Description: Rust Wi-Fi Hotspot for Linux (AP/STA Concurrent Mode)
  A lightweight native desktop GUI application that enables concurrent 
  Wi-Fi station and access point (hotspot) mode on Linux wireless cards.

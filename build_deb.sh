@@ -10,6 +10,8 @@ cp target/release/wifi deb_package/usr/bin/wifi-hotspot
 chmod +x deb_package/usr/bin/wifi-hotspot deb_package/usr/bin/wifi-hotspot-launcher
 
 echo "Building .deb package..."
-dpkg-deb --build deb_package wifi-hotspot_0.1.0_amd64.deb
+VERSION=$(grep -i '^Version:' deb_package/DEBIAN/control | awk '{print $2}')
+DEB_NAME="wifi-hotspot_${VERSION}_amd64.deb"
+dpkg-deb --build deb_package "$DEB_NAME"
 
-echo "Successfully built wifi-hotspot_0.1.0_amd64.deb!"
+echo "Successfully built $DEB_NAME!"
